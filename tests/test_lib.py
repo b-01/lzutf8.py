@@ -1,0 +1,103 @@
+from unittest import TestCase
+
+from lzutf8 import Compressor, CompressorSimpleHashTable
+
+class SimpleTest(TestCase):
+
+    def test_lib(self):
+        string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \r\nMaecenas id dignissim enim. \tNunc tincidunt lacus vel fringilla pretium. Maecenas eu gravida nibh, et dapibus dui. Suspendisse porta orci id metus laoreet laoreet. In hac habitasse platea dictumst. Nunc venenatis lacinia sapien non dictum. Morbi vestibulum accumsan viverra. Aliquam et mauris eu enim sollicitudin varius. Pellentesque mauris turpis, tincidunt eget nulla eget, mollis lacinia urna. Donec convallis pellentesque rutrum. In rhoncus bibendum nisl, eget sagittis urna porttitor vel. Pellentesque elit quam, commodo vitae tortor vel, sodales feugiat felis. Nunc a purus id libero molestie euismod eget a urna.\r\nVivamus dapibus dictum erat eget consequat.\r\n Vivamus egestas neque sed metus gravida porttitor ac et tortor. Duis faucibus tortor nec porta tincidunt.\r\n Nulla ac libero lacus.\t Morbi hendrerit ligula et turpis varius suscipit. \rCum \nsociis natoque penatibus et magnis dis parturient montes, \tnascetur ridiculus mus. Suspendisse pulvinar consequat est, ac venenatis libero tincidunt et.\r\n Aliquam aliquam tortor nisi, eu eleifend justo pellentesque et. Nunc in lorem et ligula congue \tlacinia sed vitae metus. Aliquam porta, ipsum vitae malesuada porttitor, orci massa ornare libero, ac cursus risus urna fermentum mi. Sed quis eleifend dolor. Sed eu justo quis arcu adipiscing gravida. \n Vestibulum molestie velit nec sagittis commodo.\nIn purus purus, consectetur sollicitudin orci vitae, molestie gravida turpis. Aliquam erat volutpat. Integer id dolor lacus. In facilisis neque erat.  Pellentesque bibendum nisi sit amet nulla euismod, eget sollicitudin metus vestibulum. Phasellus porttitor dignissim dignissim. Curabitur quam orci, adipiscing vitae purus ut, aliquet adipiscing felis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam suscipit nulla a velit ornare, eu dignissim tellus tristique. Aenean ac nunc nec orci mollis laoreet ut sit amet leo. Morbi tincidunt massa leo, sit amet placerat turpis ultrices sed. Donec sit amet fringilla lacus, sed adipiscing turpis. Nunc vel porta quam. Quisque id eros iaculis, rutrum turpis ac, viverra velit. Proin iaculis elit vestibulum lorem faucibus, ac lobortis tellus egestas.  Praesent aliquet dolor in lectus laoreet pulvinar. Phasellus ornare non tellus sollicitudin tempus. In ultricies sapien eget tempus feugiat. In suscipit velit volutpat est aliquet, ac sagittis metus suscipit. Aliquam vel tellus non justo vestibulum varius. Phasellus id ornare velit, a consectetur dui. Donec facilisis leo sit amet nulla vestibulum tincidunt. Proin est nibh, pulvinar ut elit ac, tristique porttitor massa. Praesent lobortis fringilla nulla vitae pellentesque. Aliquam congue fringilla eros, vitae lacinia nisl euismod id. Fusce leo sem, ornare a vulputate in, lacinia nec dui.\n In sed mauris in enim faucibus lacinia in vel diam. \t\r\nProin commodo mauris a fermentum viverra. Fusce imperdiet diam diam, ornare vestibulum nibh blandit nec.  Curabitur eget ante gravida, malesuada nibh luctus, molestie augue. \r\nEtiam tristique tortor justo, quis dapibus urna viverra commodo. Aenean rutrum eget urna vitae consequat. \t\r\nEtiam in arcu non nulla porta consequat sed in magna. Vivamus vel mauris a nulla vehicula viverra. Etiam venenatis quis tellus nec sagittis. Pellentesque ac lacus porta, gravida diam id, euismod sem. Praesent vel molestie leo. Vivamus fringilla rutrum lectus, quis fringilla neque ultrices eget. Pellentesque gravida ipsum massa, at dapibus neque ullamcorper non. Aliquam iaculis consectetur dui. Suspendisse nec euismod urna, condimentum lacinia velit. \r\n\tAliquam erat volutpat. \tCurabitur accumsan, dui non iaculis vulputate, odio purus vehicula odio, a accumsan purus felis ut tellus. \nDuis leo purus, faucibus at blandit sit amet, imperdiet non tortor."
+        # result taken from executing the same string in lzutf8 jslib
+        result = [
+            76, 111, 114, 101, 109, 32, 105, 112, 115, 117, 109, 32, 100, 111, 108, 111, 114, 32, 115, 105, 116, 32, 97,
+            109, 101, 116, 44, 32, 99, 111, 110, 115, 101, 99, 116, 101, 116, 117, 114, 32, 97, 100, 105, 112, 105, 115, 99,
+            105, 110, 103, 32, 101, 108, 105, 116, 46, 32, 13, 10, 77, 97, 101, 99, 101, 110, 97, 115, 32, 105, 100, 32,
+            100, 105, 103, 110, 105, 115, 115, 105, 109, 32, 101, 110, 105, 109, 46, 32, 9, 78, 117, 110, 99, 32, 116, 105,
+            110, 99, 105, 100, 117, 110, 116, 32, 108, 97, 99, 117, 115, 32, 118, 101, 108, 32, 102, 114, 105, 110, 103,
+            105, 108, 108, 97, 32, 112, 114, 101, 116, 105, 117, 109, 46, 32, 201, 73, 101, 117, 32, 103, 114, 97, 118, 105,
+            100, 97, 32, 110, 105, 98, 104, 44, 32, 101, 116, 32, 100, 97, 112, 105, 98, 117, 115, 32, 100, 117, 105, 46,
+            32, 83, 117, 115, 112, 101, 110, 100, 105, 115, 115, 101, 32, 112, 111, 114, 116, 97, 32, 111, 114, 99, 105,
+            228, 0, 129, 109, 101, 116, 117, 115, 32, 108, 97, 111, 114, 101, 101, 196, 111, 197, 8, 46, 32, 73, 110, 32,
+            104, 97, 99, 32, 104, 97, 98, 105, 116, 97, 197, 54, 108, 97, 116, 101, 97, 32, 100, 105, 99, 116, 117, 109,
+            115, 116, 46, 32, 229, 0, 169, 118, 101, 110, 101, 110, 97, 116, 105, 196, 66, 99, 105, 110, 105, 97, 32, 115,
+            97, 112, 105, 101, 110, 32, 110, 111, 110, 199, 44, 46, 32, 77, 111, 114, 98, 105, 32, 118, 101, 115, 116, 105,
+            98, 117, 108, 117, 109, 32, 97, 99, 99, 117, 109, 115, 97, 110, 32, 118, 105, 118, 101, 114, 114, 97, 46, 32,
+            65, 108, 105, 113, 117, 97, 109, 228, 0, 184, 109, 97, 117, 114, 105, 229, 0, 211, 228, 1, 18, 32, 115, 111,
+            108, 108, 105, 99, 105, 116, 117, 100, 105, 110, 32, 118, 97, 114, 105, 117, 115, 46, 32, 80, 101, 108, 108,
+            101, 110, 116, 101, 115, 113, 117, 101, 200, 49, 116, 117, 114, 112, 105, 115, 44, 235, 1, 60, 101, 103, 101,
+            116, 32, 110, 117, 228, 1, 51, 196, 11, 44, 32, 109, 196, 76, 234, 0, 171, 117, 114, 110, 97, 46, 32, 68, 111,
+            110, 101, 99, 228, 1, 179, 118, 97, 197, 30, 112, 204, 92, 114, 117, 116, 114, 228, 0, 195, 73, 110, 32, 114,
+            104, 111, 110, 228, 1, 140, 98, 105, 98, 101, 110, 100, 117, 109, 32, 110, 105, 115, 108, 44, 198, 101, 115, 97,
+            103, 105, 116, 228, 1, 6, 196, 83, 229, 1, 97, 116, 105, 116, 111, 114, 228, 1, 184, 239, 0, 173, 228, 2, 4, 32,
+            228, 0, 235, 228, 2, 38, 109, 109, 111, 100, 111, 32, 118, 105, 116, 97, 101, 32, 116, 111, 114, 199, 50, 44,
+            32, 115, 111, 100, 97, 108, 101, 115, 32, 102, 101, 117, 103, 105, 97, 116, 32, 102, 101, 108, 105, 115, 231, 1,
+            114, 97, 32, 112, 117, 114, 117, 229, 2, 60, 108, 105, 98, 101, 114, 111, 228, 0, 214, 228, 1, 91, 101, 32, 101,
+            117, 105, 115, 109, 111, 100, 230, 0, 147, 231, 0, 223, 13, 10, 86, 105, 118, 97, 109, 228, 2, 8, 232, 2, 16,
+            229, 1, 150, 32, 101, 114, 97, 231, 1, 34, 229, 2, 174, 113, 117, 97, 116, 46, 13, 10, 32, 200, 46, 101, 103,
+            101, 115, 116, 97, 115, 32, 110, 101, 228, 0, 182, 115, 101, 232, 2, 41, 232, 2, 103, 234, 0, 228, 97, 99, 228,
+            1, 182, 230, 0, 191, 46, 32, 68, 117, 105, 115, 32, 102, 97, 117, 99, 197, 108, 198, 22, 32, 228, 1, 97, 196,
+            49, 97, 234, 1, 157, 196, 108, 78, 229, 1, 155, 97, 99, 232, 0, 201, 229, 2, 236, 46, 9, 231, 2, 48, 104, 101,
+            110, 100, 114, 101, 114, 105, 116, 32, 108, 105, 103, 117, 228, 1, 196, 116, 231, 1, 228, 231, 2, 7, 32, 115,
+            117, 115, 99, 105, 112, 229, 3, 84, 67, 117, 109, 32, 10, 115, 111, 99, 105, 105, 115, 32, 110, 97, 116, 111,
+            228, 0, 181, 112, 229, 2, 154, 228, 0, 135, 229, 2, 86, 228, 3, 104, 32, 100, 228, 1, 225, 97, 114, 116, 117,
+            114, 105, 101, 110, 116, 32, 109, 111, 228, 1, 152, 44, 32, 9, 110, 97, 115, 99, 229, 3, 175, 114, 105, 100,
+            105, 99, 117, 108, 117, 115, 32, 109, 228, 2, 105, 237, 3, 56, 117, 108, 118, 105, 110, 97, 114, 234, 1, 49, 32,
+            101, 115, 116, 44, 228, 0, 193, 235, 3, 7, 230, 0, 203, 235, 2, 133, 229, 0, 235, 232, 2, 224, 97, 199, 8, 232,
+            1, 25, 105, 115, 105, 44, 229, 2, 235, 108, 101, 105, 102, 101, 110, 100, 32, 106, 117, 115, 116, 111, 238, 2,
+            132, 228, 3, 143, 229, 1, 251, 105, 110, 32, 108, 229, 4, 118, 228, 3, 169, 230, 1, 20, 99, 111, 110, 103, 117,
+            101, 32, 9, 233, 3, 126, 101, 100, 231, 2, 80, 229, 1, 175, 234, 3, 89, 229, 1, 127, 44, 231, 4, 176, 199, 34,
+            228, 2, 100, 117, 97, 236, 1, 205, 44, 230, 4, 23, 109, 97, 115, 115, 228, 4, 34, 110, 97, 114, 101, 231, 0,
+            210, 229, 0, 231, 99, 117, 114, 115, 117, 115, 32, 114, 105, 196, 6, 229, 2, 235, 102, 101, 114, 109, 101, 110,
+            228, 2, 80, 109, 228, 4, 102, 101, 100, 32, 113, 228, 2, 1, 233, 0, 207, 229, 5, 26, 198, 25, 101, 117, 231, 0,
+            221, 197, 34, 97, 114, 99, 117, 236, 5, 28, 231, 2, 88, 46, 32, 10, 32, 86, 234, 4, 41, 233, 2, 219, 118, 229,
+            3, 56, 228, 2, 72, 233, 3, 107, 231, 3, 63, 46, 10, 73, 110, 231, 3, 19, 197, 6, 238, 5, 126, 237, 4, 62, 229,
+            0, 220, 229, 0, 252, 229, 4, 11, 198, 90, 199, 121, 231, 2, 91, 235, 4, 138, 228, 3, 32, 118, 111, 108, 117,
+            116, 112, 97, 229, 5, 16, 116, 101, 103, 101, 114, 229, 5, 179, 229, 5, 238, 230, 2, 173, 228, 4, 25, 102, 97,
+            99, 105, 108, 105, 115, 228, 2, 122, 229, 3, 45, 196, 58, 46, 32, 238, 3, 247, 236, 4, 53, 105, 233, 6, 42, 232,
+            4, 157, 230, 3, 184, 232, 4, 76, 236, 0, 179, 230, 3, 117, 234, 5, 59, 46, 32, 80, 104, 97, 115, 101, 108, 228,
+            2, 161, 234, 3, 131, 234, 6, 69, 201, 10, 46, 32, 67, 117, 114, 228, 5, 189, 117, 114, 229, 4, 111, 229, 0, 253,
+            44, 236, 1, 114, 230, 2, 5, 230, 1, 58, 117, 228, 2, 199, 228, 0, 249, 228, 4, 57, 202, 35, 231, 4, 120, 228, 3,
+            93, 255, 3, 92, 251, 3, 92, 248, 3, 91, 232, 1, 105, 232, 3, 198, 231, 1, 13, 97, 231, 1, 236, 230, 2, 126, 229,
+            3, 29, 234, 0, 223, 116, 230, 0, 250, 116, 114, 105, 115, 116, 228, 0, 174, 46, 32, 65, 101, 110, 101, 97, 110,
+            228, 2, 157, 110, 228, 3, 35, 228, 2, 34, 230, 2, 195, 232, 5, 235, 230, 6, 216, 117, 116, 234, 1, 117, 108,
+            101, 111, 232, 6, 148, 234, 3, 167, 230, 2, 243, 108, 101, 111, 44, 202, 41, 112, 108, 97, 99, 229, 2, 7, 231,
+            4, 119, 117, 108, 116, 114, 105, 99, 101, 115, 228, 3, 102, 232, 6, 56, 201, 45, 234, 7, 159, 229, 2, 26, 44,
+            196, 37, 236, 1, 76, 198, 68, 233, 7, 55, 108, 231, 5, 17, 228, 1, 3, 46, 32, 81, 117, 105, 229, 2, 39, 105,
+            100, 32, 101, 114, 111, 115, 32, 105, 97, 99, 117, 108, 228, 6, 205, 230, 6, 128, 199, 61, 32, 97, 99, 44, 232,
+            7, 51, 196, 67, 228, 4, 250, 80, 114, 111, 105, 110, 200, 48, 230, 6, 94, 235, 7, 105, 230, 4, 47, 232, 5, 143,
+            229, 3, 196, 108, 111, 98, 111, 114, 228, 3, 64, 231, 1, 76, 231, 5, 233, 228, 2, 177, 114, 97, 101, 115, 228,
+            1, 186, 232, 2, 10, 230, 2, 233, 228, 4, 118, 101, 99, 236, 8, 37, 232, 5, 9, 236, 2, 141, 231, 4, 45, 228, 7,
+            247, 199, 89, 237, 2, 200, 116, 101, 109, 112, 231, 3, 47, 230, 1, 70, 105, 228, 1, 71, 230, 8, 43, 229, 2, 246,
+            198, 33, 232, 6, 242, 197, 41, 233, 2, 25, 230, 2, 17, 232, 3, 140, 228, 5, 117, 232, 0, 163, 229, 0, 210, 233,
+            4, 18, 230, 3, 45, 200, 55, 234, 2, 98, 228, 1, 110, 231, 0, 149, 228, 0, 160, 230, 4, 134, 235, 1, 38, 233, 8,
+            86, 233, 0, 206, 105, 100, 232, 0, 209, 197, 124, 44, 32, 229, 5, 106, 233, 4, 86, 229, 9, 83, 230, 2, 0, 234,
+            3, 253, 108, 101, 111, 240, 3, 217, 203, 100, 234, 6, 249, 231, 1, 179, 228, 0, 198, 230, 9, 172, 233, 6, 88,
+            117, 116, 230, 1, 193, 228, 1, 231, 233, 2, 227, 235, 3, 231, 229, 2, 164, 196, 64, 231, 1, 168, 233, 1, 203,
+            234, 2, 124, 199, 120, 230, 3, 219, 235, 4, 129, 234, 1, 13, 231, 6, 50, 202, 51, 228, 2, 113, 228, 2, 87, 196,
+            51, 232, 6, 71, 228, 8, 219, 233, 8, 79, 105, 100, 46, 32, 70, 117, 115, 99, 101, 230, 0, 227, 101, 109, 228, 6,
+            38, 229, 1, 29, 97, 32, 118, 117, 108, 112, 117, 116, 97, 116, 101, 32, 105, 110, 44, 202, 63, 101, 99, 229, 1,
+            36, 10, 229, 1, 199, 228, 8, 60, 230, 9, 163, 228, 0, 247, 228, 9, 212, 233, 8, 32, 200, 49, 228, 9, 219, 101,
+            108, 32, 100, 105, 228, 3, 13, 9, 13, 10, 230, 1, 35, 232, 9, 33, 199, 62, 236, 6, 110, 233, 10, 57, 230, 0,
+            153, 105, 109, 112, 101, 114, 100, 105, 228, 2, 180, 105, 97, 228, 5, 6, 228, 9, 96, 233, 1, 194, 233, 1, 133,
+            228, 1, 112, 32, 98, 108, 97, 110, 100, 230, 6, 77, 46, 32, 235, 5, 38, 230, 9, 54, 110, 116, 233, 6, 19, 44,
+            235, 7, 34, 197, 58, 108, 117, 228, 3, 7, 235, 6, 60, 97, 117, 103, 228, 1, 91, 13, 10, 69, 116, 196, 119, 234,
+            1, 180, 231, 7, 223, 229, 2, 106, 44, 230, 6, 241, 232, 9, 127, 229, 7, 55, 232, 3, 197, 232, 6, 196, 232, 4,
+            199, 231, 3, 239, 229, 0, 139, 199, 41, 228, 1, 151, 234, 9, 162, 228, 1, 29, 198, 109, 105, 110, 230, 7, 68,
+            228, 2, 210, 230, 1, 246, 230, 4, 81, 201, 44, 229, 1, 121, 228, 6, 67, 97, 103, 228, 10, 231, 232, 9, 217, 228,
+            1, 104, 233, 1, 81, 198, 57, 118, 101, 104, 228, 5, 153, 233, 0, 151, 46, 32, 198, 99, 234, 8, 214, 229, 0, 194,
+            232, 3, 67, 235, 7, 133, 239, 10, 221, 228, 4, 95, 229, 12, 176, 231, 8, 110, 232, 7, 92, 229, 1, 149, 105, 228,
+            6, 225, 231, 2, 83, 115, 101, 228, 6, 202, 232, 2, 200, 229, 0, 147, 232, 1, 84, 229, 5, 158, 232, 0, 173, 234,
+            2, 166, 231, 1, 26, 230, 4, 138, 231, 1, 83, 202, 30, 230, 7, 121, 233, 5, 160, 228, 1, 64, 239, 0, 155, 232, 0,
+            139, 230, 9, 1, 229, 3, 74, 44, 32, 97, 234, 13, 38, 200, 66, 108, 97, 109, 99, 111, 114, 112, 101, 114, 228, 1,
+            89, 234, 3, 54, 232, 5, 97, 241, 4, 6, 236, 10, 33, 228, 1, 26, 232, 0, 226, 228, 1, 190, 229, 8, 139, 100, 105,
+            231, 2, 179, 232, 2, 236, 231, 5, 185, 13, 10, 9, 247, 8, 107, 9, 234, 2, 148, 232, 13, 41, 44, 196, 109, 229,
+            1, 235, 232, 0, 137, 233, 3, 121, 44, 32, 111, 100, 105, 111, 231, 7, 200, 233, 1, 202, 196, 20, 228, 4, 182,
+            200, 65, 199, 32, 229, 7, 209, 228, 4, 104, 230, 1, 204, 46, 32, 10, 229, 11, 176, 228, 3, 216, 197, 33, 44,
+            234, 3, 155, 97, 116, 233, 3, 42, 234, 14, 217, 234, 3, 104, 229, 5, 233, 230, 11, 244
+        ]
+        
+        compressor = Compressor(customHashTable=CompressorSimpleHashTable)
+        compressed_string = compressor.compressBlock(string.encode("utf-8"))
+
+        self.assertEqual(len(result), 2131)
+        self.assertEqual(len(compressed_string), 2131)
+        self.assertEqual(compressed_string, result)
